@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-deploy:
+  build-deploy-s3:
     runs-on: ubuntu-latest
     steps:
       # Use the checkout action so that this "script" has access to our project files.
@@ -54,5 +54,6 @@ jobs:
 
       # Deploy our built files to our S3 bucket.
       - name: Deploy to S3 bucket
-        run: aws s3 sync dist s3://mydioxustestapp --delete
+        working-directory: dist
+        run: aws s3 sync . s3://mydioxustestapp --delete
 
