@@ -1,5 +1,14 @@
 name: github pages
 
+# This tells GitHub that we want this action "script" to
+# have the permission to write to files within our repository.
+# This is needed so that the final deploy action can write the built
+# project files to the `gh-pages` branch.
+permissions:
+  contents: write
+
+# This tells GitHub that we want this action "script" to
+# run whenever a commit is pushed to the `main` branch.
 on: 
   push:
     branches:
