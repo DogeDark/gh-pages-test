@@ -1,0 +1,58 @@
+name: deploy s3
+
+# This tells GitHub that we want this action "script" to
+# run whenever a commit is pushed to the `main` branch.
+on: 
+  push:
+    branches:
+      - main
+
+# We don't want multiple deployments running at the same time. 
+# This tells GitHub to cancel the workflow if another one has started.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Use the checkout action so that this "script" has access to our project files.
+      - uses: actions/checkout@v4
+
+      # Setup the AWS CLI with our access key defined in our GitHub secrets.
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}         # Our AWS_ACCESS_KEY_ID secret
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }} # Our AWS_SECRET_ACCESS_KEY secret
+          aws-region: us-east-2 # Replace this with the region of your S3 bucket.
+
+      # Install Rust with the `rust-toolchain` action.
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+          targets: wasm32-unknown-unknown
+
+      # Use another action to cache our files when possible.
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: "true"
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      # Install a tool that makes it quicker to install other tools.
+      - uses: cargo-bins/cargo-binstall@main
+
+      # Install the Dioxus CLI
+      - name: Install CLI
+        run: cargo binstall dioxus-cli -y --force
+
+      # Build our Dioxus app in release.
+      - name: Build
+        run: dx build --release
+
+      # Deploy our built files to our S3 bucket.
+      - name: Deploy to S3 bucket
+        run: aws s3 sync dist s3://mydioxustestapp --delete
+
