@@ -17,7 +17,7 @@ fn App() -> Element {
         link { rel: "stylesheet", href: "main.css" }
         img { src: "header.svg", id: "header" }
         div { id: "links",
-            a { target: "_blank", href: "https://dioxuslabs.com/learn/0.5/", "📚 Learn Dioxus please!" }
+            a { target: "_blank", href: "https://dioxuslabs.com/learn/0.5/", "📚 Learn Dioxus please please please!" }
             a { target: "_blank", href: "https://dioxuslabs.com/awesome", "🚀 Awesome Dioxus" }
             a { target: "_blank", href: "https://github.com/dioxus-community/", "📡 Community Libraries" }
             a { target: "_blank", href: "https://github.com/DioxusLabs/dioxus-std", "⚙️ Dioxus Standard Library" }
